@@ -17,7 +17,7 @@
 
 为了加深对于`kubernets`的理解，现计划翻译官方英文使用教程，有以下部分
 
-- [ ] Web UI (Dashboard)
+- [ ] #### [Web UI (Dashboard)](https://github.com/goodliving/smarthome/tree/master/kubernets/learn/webui)
 
 
 - [ ] #### Using the kubectl Command-line
