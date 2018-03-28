@@ -297,48 +297,7 @@ Mar 22 15:20:23 manager kubelet: W0322 15:20:23.519498    5679 cni.go:171] Unabl
 Mar 22 15:20:23 manager kubelet: E0322 15:20:23.520304    5679 kubelet.go:2120] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:docker: network plugin is not ready: cni config uninitialized
 ```
 
-安装`weave`网络插件即可，可以参考[官网](https://www.weave.works/docs/net/latest/kubernetes/)使用说明中安装此网络插件。
+安装`fannel`网络插件即可，可以参考[官网](https://www.weave.works/docs/net/latest/kubernetes/)使用说明中安装此网络插件。
 
-首先，创建好`/etc/cni/net.d`目录，之后下载`weave`可执行文件到本地，如下所示
-
-```shell
-[root@manager opt]# sudo curl -L git.io/weave -o /usr/local/bin/weave
-[root@manager opt]# sudo chmod a+x /usr/local/bin/weave
-[root@manager opt]# weave launch 192.168.137.100
-```
-
-等待脚本拉取镜像完毕后，显示如下
-
-```shell
-[root@manager net.d]# pwd
-/etc/cni/net.d
-[root@manager net.d]# l
-total 4
--rw-r--r-- 1 root root 74 Mar 22 15:28 10-weave.conf
-[root@manager net.d]# cat 10-weave.conf
-{
-    "name": "weave",
-    "type": "weave-net",
-    "hairpinMode": true
-}
-```
-
-之后，日志文件中报错信息消除
-
-```shell
-Mar 22 15:28:14 manager kubelet: W0322 15:28:14.121472    5679 cni.go:171] Unable to update cni config: No networks found in /etc/cni/net.d
-Mar 22 15:28:14 manager kubelet: E0322 15:28:14.122477    5679 kubelet.go:2120] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:docker: network plugin is not ready: cni config uninitialized
-Mar 22 15:28:14 manager dockerd: time="2018-03-22T15:28:14Z" level=info msg="shim reaped" id=4d5940191c64bb4c5fecc2795b61fddb4409b193e7bb5eadcdf131f490bec0ee module="containerd/tasks"
-Mar 22 15:28:14 manager dockerd: time="2018-03-22T15:28:14.806534703Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
-Mar 22 15:28:28 manager dhclient[7761]: DHCPREQUEST on eth0 to 192.168.137.1 port 67 (xid=0x29bf3deb)
-Mar 22 15:28:28 manager dhclient[7761]: DHCPACK from 192.168.137.1 (xid=0x29bf3deb)
-Mar 22 15:28:28 manager NetworkManager[226]: <info>  [1521732508.3093] dhcp4 (eth0):   address 192.168.137.100
-Mar 22 15:28:28 manager NetworkManager[226]: <info>  [1521732508.3094] dhcp4 (eth0):   plen 24 (255.255.255.0)
-Mar 22 15:28:28 manager NetworkManager[226]: <info>  [1521732508.3095] dhcp4 (eth0):   gateway 192.168.137.1
-Mar 22 15:28:28 manager NetworkManager[226]: <info>  [1521732508.3096] dhcp4 (eth0):   lease time 604800
-Mar 22 15:28:28 manager NetworkManager[226]: <info>  [1521732508.3097] dhcp4 (eth0):   nameserver '192.168.137.1'
-Mar 22 15:28:28 manager NetworkManager[226]: <info>  [1521732508.3097] dhcp4 (eth0):   domain name 'mshome.net'
-Mar 22 15:28:28 manager NetworkManager[226]: <info>  [1521732508.3098] dhcp4 (eth0): state changed bound -> bound
-Mar 22 15:28:28 manager dbus[204]: [system] Activating via systemd: service name='org.freedesktop.nm_dispatcher' unit='dbus-or
-```
+首先，创建好`/etc/cni/net.d`目录，之后通过`kubelet`安装即可，参考上面关于安装步骤。
 
