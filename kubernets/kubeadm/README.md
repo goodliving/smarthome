@@ -25,7 +25,7 @@
 * `driver`类型
 * 设置`bridge-nf-call-iptables`
 * 本地镜像
-* 安装`weave`网络
+* 安装`flannel`网络
 
 对于drive类型的修改，因为docker默认安装是`cgroupfs`，所以需要进行一些配置，如下
 
@@ -101,14 +101,13 @@ featureGates:
 imageRepository: "192.168.137.62:5000/google_containers" # 私有镜像地址
 ```
 
-在`kubeadm init`成功之后，还需要安装网络模型，本次是选择安装`weave`，安装步骤比较简单，下载二进制文件到本地安装即可，如下所示
+在`kubeadm init`成功之后，还需要安装网络模型，本次是选择安装`flannel`，安装步骤比较简单，从官网下载[kube-flannel.yml](https://github.com/coreos/flannel/tree/master/Documentation)，修改镜像架构`amd`为`arm`，之后安装即可
 
 ```shell
-sudo curl -L git.io/weave -o /usr/local/bin/weave
-sudo chmod a+x /usr/local/bin/weave
-[root@node2 opt]# mkdir /etc/cni/net.d -p
-[root@node2 opt]# ./weave setup 
+[root@master1 Documentation]# kubectl create -f kube-flannel.yml
 ```
+
+> **在安装之前把镜像拉下来在本地，安装过程中可能会出现下载失败的情况**
 
 上述执行完毕后，会在`/etc/cni/net.d`写入一个配置文件，之后在`master`机器上`kubectl get nodes`会出现节点状态是	`ready`表示正常。
 
@@ -125,7 +124,7 @@ master1   Ready     master    23h       v1.9.6
 [root@master1 dashboard]# scp config.yml root@192.168.137.103:/etc/kubernetes/
 ```
 
-然后，在另一节点上使用`kubeadm init --config /path/to/config.yml`即可，在这台机器上会使用刚才`master`生成的秘钥文件，等待结束后，这样就装好了高可用的`kubernets`集群，同样安装好`weave`网络插件，通过`kubelet get nodes`来查看集群运行状态
+然后，在另一节点上使用`kubeadm init --config /path/to/config.yml`即可，在这台机器上会使用刚才`master`生成的秘钥文件，等待结束后，这样就装好了高可用的`kubernets`集群，同样安装好`flannel`网络插件，通过`kubelet get nodes`来查看集群运行状态
 
 ```shell
 [root@master1 dashboard]# kubectl get nodes
@@ -134,16 +133,120 @@ master1   Ready     master    23h       v1.9.6
 master2   Ready     master    1h        v1.9.6
 ```
 
-这样，`master`机器安装完毕，然后我们添加节点机器到该集群中，使用刚才生成`kubeadm join`命令，在节点执行即可，同样需要安装网络`weave`，在此不做过多说明，最终结果如下
+> **master2机器使用`kubectl create -f kube-flannel.yml --namespace=kube-system`，不指定命名空间会报已存在**
+
+这样，`master`机器安装完毕，然后我们添加节点机器到该集群中，使用刚才生成`kubeadm join`命令，在节点执行即可，在此不做过多说明，最终结果如下
 
 ```shell
 [root@master1 dashboard]# kubectl get nodes
 NAME      STATUS    ROLES     AGE       VERSION
 master1   Ready     master    23h       v1.9.6
-master2   Ready     master    1h        v1.9.6
 node1     Ready     <none>    1h        v1.9.6
 node2     Ready     <none>    1h        v1.9.6
 ```
+### 集群功能验证
+
+接下我们通过在节点中运行一个`nginx`容器，通过访问其映射的端口来确认正常，首先创建一个`pod`
+
+```shell
+[root@master1 opt]# kubectl run nginx --image=nginx --port=80
+deployment "nginx" created
+[root@master1 opt]# kubectl get pods -o wide
+NAME                     READY     STATUS    RESTARTS   AGE       IP           NODE
+nginx-7587c6fdb6-nl79f   1/1       Running   0          50s       10.244.2.2   node2
+[root@master1 opt]#
+[root@master1 opt]# kubectl describe pods/nginx-7587c6fdb6-nl79f
+Name:           nginx-7587c6fdb6-nl79f
+Namespace:      default
+Node:           node2/192.168.137.180
+Start Time:     Wed, 28 Mar 2018 14:23:49 +0000
+Labels:         pod-template-hash=3143729862
+                run=nginx
+Annotations:    <none>
+Status:         Running
+IP:             10.244.2.2
+Controlled By:  ReplicaSet/nginx-7587c6fdb6
+Containers:
+  nginx:
+    Container ID:   docker://f80c72d5a0fd3fa11410d05b5849767b3d6162f3b097c9cee565c2d0aeeb6a16
+    Image:          nginx
+    Image ID:       docker-pullable://nginx@sha256:c4ee0ecb376636258447e1d8effb56c09c75fe7acf756bf7c13efadf38aa0aca
+    Port:           80/TCP
+    State:          Running
+      Started:      Wed, 28 Mar 2018 14:23:53 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-ljfzf (ro)
+Conditions:
+  Type           Status
+  Initialized    True
+  Ready          True
+  PodScheduled   True
+Volumes:
+  default-token-ljfzf:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-ljfzf
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason                 Age   From               Message
+  ----    ------                 ----  ----               -------
+  Normal  Scheduled              23s   default-scheduler  Successfully assigned nginx-7587c6fdb6-nl79f to node2
+  Normal  SuccessfulMountVolume  23s   kubelet, node2     MountVolume.SetUp succeeded for volume "default-token-ljfzf"
+  Normal  Pulling                21s   kubelet, node2     pulling image "nginx"
+  Normal  Pulled                 19s   kubelet, node2     Successfully pulled image "nginx"
+  Normal  Created                19s   kubelet, node2     Created container
+  Normal  Started                19s   kubelet, node2     Started container
+```
+
+可以看出，该`pod`已经获取到一个`ip`地址，但是直接访问其`ip`是无法访问的，可以通过将其端口映射到节点`node`的端口，如下
+
+```shell
+[root@master1 opt]# kubectl expose deploy nginx --type=NodePort --target-port=80 
+service "nginx" exposed
+[root@master1 opt]# kubectl get svc nginx
+NAME      TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+nginx     NodePort   10.103.130.130   <none>        80:31105/TCP   13s
+```
+
+其中，`31105`是指节点主机的端口，通过`curl http://$nodeip:31105`来访问`pod`的`80`端口，如下
+
+```shell
+[root@node2 opt]# curl http://192.168.137.180:31105
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+```
+
+
+
 ### 问题处理
 
 以下记录使用kubeadm安装过程中系统日志报错以及解决方法
