@@ -67,3 +67,18 @@ deployment "nginx" deleted
 No resources found.
 ```
 
+##### 删除service
+
+```shell
+[root@master1 dashboard]# kubectl get svc
+NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP        2h
+nginx        NodePort    10.103.130.130   <none>        80:31105/TCP   1h
+[root@master1 dashboard]#
+[root@master1 dashboard]# kubectl delete service nginx
+service "nginx" deleted
+[root@master1 dashboard]# kubectl get svc
+NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   2h
+```
+
