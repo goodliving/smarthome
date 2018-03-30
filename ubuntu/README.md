@@ -12,6 +12,13 @@
 [root@node1 net.d]# cat /etc/sysctl.conf
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
+root@master2:~# sysctl -p /etc/sysctl.conf
+sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-ip6tables: No such file or directory
+sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-iptables: No such file or directory
+root@master2:~# modprobe br_netfilter
+root@master2:~# ls /proc/sys/net/bridge
+bridge-nf-call-arptables  bridge-nf-call-iptables        bridge-nf-filter-vlan-tagged
+bridge-nf-call-ip6tables  bridge-nf-filter-pppoe-tagged  bridge-nf-pass-vlan-input-dev
 [root@node1 net.d]# sysctl -p /etc/sysctl.conf # 出现以下表示已经生效
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
@@ -66,5 +73,17 @@ root@master1:/etc/apt/sources.list.d# pwd
 /etc/apt/sources.list.d
 root@master1:/etc/apt/sources.list.d# cat kubernets.list
 deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
+```
+
+#### 修改linux时区为CST
+
+```shell
+[root@drone-ci ~]# ln -s /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime
+```
+
+#### 修改linux时区为UTC
+
+```shell
+[root@drone-ci ~]# ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 ```
 
