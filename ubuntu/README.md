@@ -30,6 +30,15 @@ root@ubuntu:/etc/apt/sources.list.d# gpg --keyserver keyserver.ubuntu.com --recv
 root@ubuntu:/etc/apt/sources.list.d# gpg --export --armor 7EA0A9C3F273FCD8| sudo apt-key add -
 ```
 
+#### docker-ce软件源地址
+
+```shell
+root@master1:/etc/apt/sources.list.d# pwd
+/etc/apt/sources.list.d
+root@master1:/etc/apt/sources.list.d# cat docker-ce.list
+deb https://mirrors.aliyun.com/docker-ce/linux/ubuntu xenial edge
+```
+
 #### Segmentation fault处理方法
 
 在`apt-get install`安装包时，报`Segmentation fault`，找到如下错误
@@ -48,5 +57,14 @@ Errors were encountered while processing:
 ```shell
 root@ubuntu:/etc/apt/sources.list.d# gpg --keyserver keyserver.ubuntu.com --recv  3746C208A7317B0F
 root@ubuntu:/etc/apt/sources.list.d# gpg --export --armor 3746C208A7317B0F| sudo apt-key add -
+```
+
+#### kubernets软件源地址
+
+```shell
+root@master1:/etc/apt/sources.list.d# pwd
+/etc/apt/sources.list.d
+root@master1:/etc/apt/sources.list.d# cat kubernets.list
+deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
 ```
 
