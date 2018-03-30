@@ -24,6 +24,7 @@
 
 * `driver`类型
 * 设置`bridge-nf-call-iptables`
+* 关闭`selinux`、`firewall`
 * 本地镜像
 * 安装`flannel`网络
 
@@ -65,6 +66,20 @@ net.bridge.bridge-nf-call-iptables = 1
 [root@node1 net.d]# sysctl -p /etc/sysctl.conf # 出现以下表示已经生效
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
+```
+
+在安装过程中关闭`selinux`，有两种方法，永久修改是修改`/etc/selinux/config`配置文件，将`selinux`设置为`disabled`，之后重启服务器接口；临时修改是执行`setenforce 0 `即可，之后通过`/usr/sbin/sestatus -v`查看结果，如下
+
+```shell
+[root@master1 ~]# /usr/sbin/sestatus -v
+SELinux status:                 disabled
+```
+
+关闭防火墙`firewall`是为了安装时添加对用端口，执行以下命令
+
+```shell
+systemctl disable firewall
+systemctl stop firewall
 ```
 
 以上准备完毕之后，我们就可以使用`kubeadm init --config /path/to/config.yml`来初始化安装`kubernets`集群，其中`config.yml`文件内容如下
