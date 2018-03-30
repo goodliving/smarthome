@@ -87,3 +87,11 @@ deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
 [root@drone-ci ~]# ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 ```
 
+#### 添加hosts解析
+
+```shell
+cat /etc/hosts
+```
+
+> **在kubernets集群所有主机上添加名称解析**
+
