@@ -24,7 +24,7 @@
 
 * `driver`类型
 * 设置`bridge-nf-call-iptables`
-* 关闭`selinux`、`firewall`
+* 关闭`selinux`、`firewalld`
 * 本地镜像
 * 安装`flannel`网络
 
@@ -78,8 +78,8 @@ SELinux status:                 disabled
 关闭防火墙`firewall`是为了安装时添加对用端口，执行以下命令
 
 ```shell
-systemctl disable firewall
-systemctl stop firewall
+systemctl disable firewalld
+systemctl stop firewallds
 ```
 
 以上准备完毕之后，我们就可以使用`kubeadm init --config /path/to/config.yml`来初始化安装`kubernets`集群，其中`config.yml`文件内容如下
