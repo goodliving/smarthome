@@ -82,3 +82,110 @@ NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
 kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   2h
 ```
 
+##### 编辑应用yaml
+
+```shell
+[root@master1 dashbord]# kubectl -n kube-system edit service kubernetes-dashboard
+```
+
+##### dashbord访问
+
+```shell
+[root@master1 dashbord]# kubectl proxy --address='192.168.137.100' --port=8086 --accept-hosts='^*$' # 指定host，不然会出现无认证
+```
+
+##### exec命令
+
+shell-demo.yml
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shell-demo
+spec:
+  volumes:
+  - name: shared-data
+    emptyDir: {}
+  containers:
+  - name: nginx
+    image: nginx
+    volumeMounts:
+    - name: shared-data
+      mountPath: /usr/share/nginx/html
+```
+
+```shell
+kubectl create -f shell-demo.yaml
+kubectl get pod shell-demo
+[root@master1 ~]# kubectl exec -it shell-demo -- /bin/bash
+root@shell-demo:/#
+root@shell-demo:/# ls
+bin   dev  home  media  opt   root  sbin  sys  usr
+boot  etc  lib   mnt    proc  run   srv   tmp  var
+```
+
+##### master可部署
+
+```shell
+kubectl taint nodes --all node-role.kubernetes.io/master-
+```
+
+##### 查询namespaces
+
+```shell
+root@master1:~# kubectl get namespaces
+NAME          STATUS    AGE
+default       Active    7h
+kube-public   Active    7h
+kube-system   Active    7h
+```
+
+##### 创建namespace
+
+```shell
+root@master1:~# cat namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+   name: development
+   labels:
+     name: development
+root@master1:~# kubectl create -f namespace.yaml
+namespace "development" created
+root@master1:~# kubectl get namespaces
+NAME          STATUS    AGE
+default       Active    7h
+development   Active    10s
+kube-public   Active    7h
+kube-system   Active    7h
+```
+
+##### 创建指定namespace应用
+
+```shell
+root@master1:~# cat test-namespace.yml
+apiVersion: v1
+kind: Pod
+metadata:
+   name: nginx-test
+   labels:
+     name: antilope
+   namespace: development
+spec:
+  containers:
+  - name: nginx-test
+    image: 192.168.137.62:5000/antilope/nginx
+    env:
+    - name: NAME
+      value: hello
+    - name: MESSAGES
+      value: world
+    ports:
+    - containerPort: 80
+      hostPort: 80
+root@master1:~# kubectl get pods -n development
+NAME         READY     STATUS    RESTARTS   AGE
+nginx-test   1/1       Running   0          19m
+```
+
