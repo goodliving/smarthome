@@ -86,6 +86,9 @@ SELinux status:                 disabled
 ```shell
 systemctl disable firewalld
 systemctl stop firewallds
+ip link delete cni0 
+ip link delete flannel.1 
+ip link delete docker0
 ```
 
 以上准备完毕之后，我们就可以使用`kubeadm init --config /path/to/config.yml`来初始化安装`kubernets`集群，其中`config.yml`文件内容如下
