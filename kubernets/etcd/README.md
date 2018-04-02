@@ -52,7 +52,11 @@ Redirecting to /bin/systemctl stop firewalld.service
 加密工具arm64下载如下
 
 ```shell
-wget https://pkg.cfssl.org/R1.2/cfssl_linux-arm64
+wget https://pkg.cfssl.org/R1.2/cfssl_linux-arm -O cfssl
+wget https://pkg.cfssl.org/R1.2/cfssljson_linux-arm -O cfssljson
+wget https://pkg.cfssl.org/R1.2/cfssl-certinfo_linux-amd64 -O cfssl-certinfo
+chmod +x ./*
+export PATH=.:$PATH
 ```
 
 首先创建`CA`配置文件
@@ -115,9 +119,9 @@ ca-config.json  ca.csr  ca-csr.json  ca-key.pem  ca.pem
   "CN": "etcd",
   "hosts": [
     "127.0.0.1",
-    "192.168.137.100", # 修改成自己的IP
-    "192.168.137.103", # 修改成自己的IP
-    "192.168.137.124" # 修改成自己的IP
+    "192.168.137.147", # 修改成自己的IP
+    "192.168.137.81", # 修改成自己的IP
+    "192.168.137.71" # 修改成自己的IP
   ],
   "key": {
     "algo": "rsa",
@@ -147,7 +151,7 @@ cfssl gencert -ca=ca.pem \
 [root@master etcd]# ls etcd*
 etcd  etcd.csr  etcd-csr.json  etcdctl  etcd-key.pem  etcd.pem
 
-[root@master etcd]# mkdir -p /etc/etcd/ssl
+[root@master etcd]# mkdir -p /etc/etcd/ssl /var/lib/etcd
 [root@master etcd]# cp etcd.pem etcd-key.pem  ca.pem /etc/etcd/ssl/
 ```
 
@@ -210,11 +214,12 @@ WantedBy=multi-user.target
 
 ```shell
 [root@master etcd]#  etcdctl \
->   --endpoints=https://${NODE_IP}:2379  \ 
->   --ca-file=/etc/etcd/ssl/ca.pem \
->   --cert-file=/etc/etcd/ssl/etcd.pem \
->   --key-file=/etc/etcd/ssl/etcd-key.pem \
->   cluster-health
+   --endpoints=https://${NODE_IP}:2379  \ 
+   --ca-file=/etc/etcd/ssl/ca.pem \
+   --cert-file=/etc/etcd/ssl/etcd.pem \
+   --key-file=/etc/etcd/ssl/etcd-key.pem \
+   cluster-health
+[root@node1 ssl]# etcdctl --endpoints=https://192.168.137.147:2379 --ca-file=/etc/etcd/ssl/ca.pem --cert-file=/etc/etcd/ssl/etcd.pem --key-file=/etc/etcd/ssl/etcd-key.pem cluster-health
 member 34872b39b0c7d050 is healthy: got healthy result from https://192.168.137.100:2379
 member 725fb6e82d442a2d is healthy: got healthy result from https://192.168.137.124:2379
 member 775c732a09ef19e8 is healthy: got healthy result from https://192.168.137.103:2379
