@@ -4,8 +4,25 @@
 
 ### 安装
 
+* 配置域名解析文件`/etc/resolv.conf`
+* 关闭`setlinux`以及`firewalld`
+
+
 * 软件镜像源
 * 配置修改
+* 数据存储类型
+
+##### 域名解析文件
+
+添加百度DNS服务器地址进行域名解析
+
+##### 关闭`setlinux`以及`firewalld`
+
+```shell
+sed -i 's#^SELINUX=.*#SELINUX=disable#g' /etc/sysconfig/selinux
+systemctl disable firewalld
+systemctl stop firewalld
+```
 
 ##### 软件镜像源
 
@@ -60,3 +77,6 @@ Server:
 ```
 
 以上配置好之后，`systemctl daemon-reload`来加载配置，之后`systemctl restart docker`重启即可。
+
+##### 数据存储类型
+
