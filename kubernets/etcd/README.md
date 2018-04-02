@@ -49,6 +49,12 @@ Redirecting to /bin/systemctl stop firewalld.service
 
 为了保证通信安全，集群通信之间采用`TLS`加密，使用`cfssl`来生成证书和私钥。以下操作是参考[kubernets安装博客](https://www.kubernetes.org.cn/3536.html)完成。
 
+加密工具arm64下载如下
+
+```shell
+wget https://pkg.cfssl.org/R1.2/cfssl_linux-arm64
+```
+
 首先创建`CA`配置文件
 
 ```shell
