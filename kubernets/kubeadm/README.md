@@ -22,6 +22,12 @@
 
 以上软件安装好了之后，我们就可以安装`kebuadm`了，使用`yum install`直接下载，本次操作是下载`v1.9.6`版本，等下载完毕后，需要修改`kubelet`的一些配置项。
 
+安装指定版本，通过`yum install kubeadm`来查看对应包名，然后修改成对应版本格式，如下
+
+```shell
+yum install kubelet-1.9.6-0.aarch64 kubeadm-1.9.6-0.aarch64 kubectl-1.9.6-0.aarch64 -y
+```
+
 * `driver`类型
 * 设置`bridge-nf-call-iptables`
 * 关闭`selinux`、`firewalld`
@@ -68,14 +74,14 @@ net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
 ```
 
-在安装过程中关闭`selinux`，有两种方法，永久修改是修改`/etc/selinux/config`配置文件，将`selinux`设置为`disabled`，之后重启服务器接口；临时修改是执行`setenforce 0 `即可，之后通过`/usr/sbin/sestatus -v`查看结果，如下
+在安装过程中关闭`selinux`，有两种方法，永久修改是修改`/etc/selinux/config`配置文件，将`selinux`设置为`disabled`，之后重启服务器即可；临时修改是执行`setenforce 0 `即可，之后通过`/usr/sbin/sestatus -v`查看结果，如下
 
 ```shell
 [root@master1 ~]# /usr/sbin/sestatus -v
 SELinux status:                 disabled
 ```
 
-关闭防火墙`firewall`是为了安装时添加对用端口，执行以下命令
+关闭防火墙`firewall`是为了安装时添加对应的端口，执行以下命令
 
 ```shell
 systemctl disable firewalld
