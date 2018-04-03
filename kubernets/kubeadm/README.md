@@ -91,7 +91,8 @@ ip link delete cni0
 iptables -L -n
 # 如果没有重要规则，执行清空
 iptables -P INPUT ACCEPT
-
+rm -rf /run/flannel/
+rm -rf /etc/cni/net.d/10-flannel.conflist
 ```
 
 以上准备完毕之后，我们就可以使用`kubeadm init --config /path/to/config.yml`来初始化安装`kubernets`集群，其中`config.yml`文件内容如下
@@ -330,4 +331,8 @@ Mar 22 15:20:23 manager kubelet: E0322 15:20:23.520304    5679 kubelet.go:2120] 
 
 ##### flannel组网结构
 
-在`config.yml`中`podSubnet`参数与`kube-flannel.yml`中`net-conf.json`组网信息是否为包含信息？
+在`config.yml`中`podSubnet`参数与`kube-flannel.yml`中`net-conf.json`组网信息需要保持一致，不一致的话添加节点会失败。
+
+##### etcd日志报server is likely overloaded
+
+不确定是树莓派系统性能影响的，待补充系统读写性能测试。
