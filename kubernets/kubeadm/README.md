@@ -85,10 +85,13 @@ SELinux status:                 disabled
 
 ```shell
 systemctl disable firewalld
-systemctl stop firewallds
-ip link delete cni0 
+systemctl stop firewalld
 ip link delete flannel.1 
-ip link delete docker0
+ip link delete cni0
+iptables -L -n
+# 如果没有重要规则，执行清空
+iptables -P INPUT ACCEPT
+
 ```
 
 以上准备完毕之后，我们就可以使用`kubeadm init --config /path/to/config.yml`来初始化安装`kubernets`集群，其中`config.yml`文件内容如下
@@ -106,7 +109,7 @@ etcd:
   keyFile: /etc/etcd/ssl/etcd-key.pem
   dataDir: /var/lib/etcd
 networking:
-  podSubnet: 10.244.0.0/16
+  podSubnet: 10.244.0.0/16 # 与kube-flannel.yml中组网保持一致，不然会无法运行报错
 kubernetesVersion: 1.9.6
 api:
   advertiseAddress: "192.168.137.200"
@@ -325,3 +328,6 @@ Mar 22 15:20:23 manager kubelet: E0322 15:20:23.520304    5679 kubelet.go:2120] 
 
 首先，创建好`/etc/cni/net.d`目录，之后通过`kubelet`安装即可，参考上面关于安装步骤。
 
+##### flannel组网结构
+
+在`config.yml`中`podSubnet`参数与`kube-flannel.yml`中`net-conf.json`组网信息是否为包含信息？
