@@ -89,3 +89,47 @@ PING 10.244.10.4 (10.244.10.4) 56(84) bytes of data.
 ### 服务扩容到大数量时会出现`CreateContainerError`
 
 等待一段时间过后，服务正常运行，待确认问题的实质，etcd性能、服务器性能、网络以及`kubernetes`本身的调度问题。
+
+### `docker pull`镜像报错timeout
+
+具体日志
+
+```shell
+Error response from daemon: Get https://registry-1.docker.io/v2/library/traefik/manifests/latest: Get https://auth.docker.io/token?scope=repository%3Alibrary%2Ftraefik%3Apull&service=registry.docker.io: dial tcp: lookup auth.docker.io on [::1]:53: read udp [::1]:47329->[::1]:53: read: connection refused
+```
+
+在本地`ping`该域名无法获取地址，修改本地的`DNS`服务器地址为google的`8.8.8.8`后还是报错，通过`hosts`文件添加对应域名的服务器地址。
+
+```shell
+[root@master ~]# dig @8.8.8.8 auth.docker.io
+
+; <<>> DiG 9.9.4-RedHat-9.9.4-18.el7_1.3 <<>> @8.8.8.8 auth.docker.io
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 41386
+;; flags: qr rd ra; QUERY: 1, ANSWER: 8, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+;; QUESTION SECTION:
+;auth.docker.io.                        IN      A
+
+;; ANSWER SECTION:
+auth.docker.io.         46      IN      A       54.152.209.167
+auth.docker.io.         46      IN      A       35.169.231.249
+auth.docker.io.         46      IN      A       34.200.90.16
+auth.docker.io.         46      IN      A       34.200.28.105
+auth.docker.io.         46      IN      A       52.22.181.254
+auth.docker.io.         46      IN      A       52.54.216.153
+auth.docker.io.         46      IN      A       52.204.202.231
+auth.docker.io.         46      IN      A       54.164.230.151
+```
+
+```shell
+[root@master etc]# cat /etc/hosts
+52.204.202.231 registry-1.docker.io
+54.152.209.167 auth.docker.io
+```
+
+之后，再次拉去镜像成功，待确认具体问题，猜想是`docker`启动参数设置有问题。
