@@ -29,7 +29,7 @@ Happy Helming!
 
 需要注意的是，在初始化的过程中会安装`Tiller`，而这个会从谷歌的景象中下载对应的`Tiller`景象，国内无法直接访问，自行科学上网下载对应的镜像。
 
-> **计划将`helm`7运行参数可配置，需要了解`helm`安装过程**
+> **计划将`helm`运行参数可配置，需要了解`helm`安装过程**
 
 报错如下
 
@@ -174,13 +174,15 @@ Events:
 
 > **在安装kubernetes时未安装`volume`，待`volumen`安装成功后再次尝试**
 
+
+
 ### 相关命令
 
-| 命令             | 说明                      |
-| -------------- | ----------------------- |
-| helm ls        | 查看当前有哪些版本               |
-| helm delete xx | 卸载xx版本                  |
-| helm status xx | 查看xx版本的具体信息，部署的命名空间以及状态 |
-| helm get -h    | 查看helm帮助手册              |
+| 命令                             | 说明                      |
+| ------------------------------ | ----------------------- |
+| helm ls                        | 查看当前有哪些版本               |
+| helm delete xx                 | 卸载xx版本                  |
+| helm status xx                 | 查看xx版本的具体信息，部署的命名空间以及状态 |
+| helm get -h                    | 查看helm帮助手册              |
+| helm install --debug --dry-run | 输出配置的yaml文件             |
 
-更具体的命令参考[helm命令介绍](https://docs.helm.sh/helm)。

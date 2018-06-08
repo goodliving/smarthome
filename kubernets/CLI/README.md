@@ -131,6 +131,12 @@ boot  etc  lib   mnt    proc  run   srv   tmp  var
 kubectl taint nodes --all node-role.kubernetes.io/master-
 ```
 
+##### master清除可部署
+
+```shell
+kubectl cordon master1
+```
+
 ##### 查询namespaces
 
 ```shell
@@ -187,5 +193,17 @@ spec:
 root@master1:~# kubectl get pods -n development
 NAME         READY     STATUS    RESTARTS   AGE
 nginx-test   1/1       Running   0          19m
+```
+
+##### 查看集群组件状态
+
+```shell
+kubectl get componentstatuses	
+```
+
+##### 查看集群信息
+
+```shell
+kubectl cluster-info dump
 ```
 
