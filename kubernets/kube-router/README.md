@@ -46,6 +46,7 @@ iptables --flush
 iptables -tnat --flush
 ifconfig tunl0 down
 ip link delete tunl0
+ip link delete tun192168100111@eth0 # 需要删除所有tun
 systemctl restart docker.service
 ```
 ##### 移除节点
