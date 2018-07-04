@@ -86,7 +86,7 @@ subjects:
   name: heapster
   namespace: kube-system
 ```
-
+heapster为普通用户的话，在dashboard页面中没有对应的图形显示，查看heapster容器日志会看到报没有权限
 以上部署完毕，通过`kubelet`查看，如下表示正常
 
 ```shell
