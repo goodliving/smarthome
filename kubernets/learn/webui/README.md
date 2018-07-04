@@ -71,6 +71,21 @@ total 12
 -rw-r--r-- 1 root root 1127 Mar 31 07:33 heapster.yaml
 -rw-r--r-- 1 root root  987 Mar 31 07:32 influxdb.yaml
 ```
+需要在heapster.yml文件中将heapster用户设置为管理员用户，添加如下内容
+```shell
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: heapster
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: heapster
+  namespace: kube-system
+```
 
 以上部署完毕，通过`kubelet`查看，如下表示正常
 
