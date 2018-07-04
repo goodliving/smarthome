@@ -44,9 +44,15 @@ iptables -F &&  iptables -X &&  iptables -F -t nat &&  iptables -X -t nat
 iptables -L -n
 iptables --flush  
 iptables -tnat --flush
+ifconfig tunl0 down
+ip link delete tunl0
 systemctl restart docker.service
 ```
-
+##### 移除节点
+```shell
+kubectl drain node2 --delete-local-data --force --ignore-daemonsets
+kubectl delete node node2
+```
 > **官方介绍重启`docker`可能避免了某些问题，参看[官方文档介绍](https://kubernetes.io/docs/setup/independent/troubleshooting-kubeadm/)**
 
 ##### node机器
