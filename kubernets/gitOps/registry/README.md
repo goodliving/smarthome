@@ -71,7 +71,7 @@ fetch https://mirrors.aliyun.com/alpine/v3.7/community/aarch64/APKINDEX.tar.gz
 v3.7.0-127-g4b0114024e [https://mirrors.aliyun.com/alpine/v3.7/main/]
 v3.7.0-117-g9584b2309e [https://mirrors.aliyun.com/alpine/v3.7/community/]
 OK: 8861 distinct packages available
-/go # apk add git gcc make # 安装编译器等
+/go # apk add git gcc make musl-dev # 安装编译器等
 /go/bin # go get -u -v github.com/docker/distribution # 下载源码
 /go/src/github.com/docker/distribution # pwd # 进入源码路径
 /go/src/github.com/docker/distribution
