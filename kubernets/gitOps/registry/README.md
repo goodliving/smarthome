@@ -111,7 +111,7 @@ OK: 8861 distinct packages available
 
 ```shell
 /usr/aarch64-alpine-linux-musl/bin # ln -s /usr/lib/Scrt1.o /usr/aarch64-alpine-linux-musl/bin/Scrt1.o
-/usr/aarch64-alpine-linux-musl/bin # ln -s /usr/lib/crti.o /usr/aarch64-alpine-linux-musl/bin//crti.o
+/usr/aarch64-alpine-linux-musl/bin # ln -s /usr/lib/crti.o /usr/aarch64-alpine-linux-musl/bin/crti.o
 /usr/aarch64-alpine-linux-musl/bin # ln -s /usr/lib/crtn.o /usr/aarch64-alpine-linux-musl/bin/crtn.o
 ```
 
